@@ -34,3 +34,7 @@ Redis and other technologies may be added later when needed.
 ## Project status
 
 Planning and initial setup.
+
+The `backend/` directory contains the uv project configuration. It uses Python
+3.11.2, as specified in `.python-version` at the repository root. Django and
+other dependencies will be added in a later step.
