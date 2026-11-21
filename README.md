@@ -33,8 +33,34 @@ Redis and other technologies may be added later when needed.
 
 ## Project status
 
-Planning and initial setup.
+Initial Django project setup is complete. Products, orders, and inventory
+features are not implemented yet.
 
-The `backend/` directory contains the uv project configuration. It uses Python
-3.11.2, as specified in `.python-version` at the repository root. Django and
-other dependencies will be added in a later step.
+## Local setup
+
+### Prerequisites
+
+- Python 3.11.2, as specified in `.python-version`
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+From the repository root, install the dependencies and create the database
+tables:
+
+```powershell
+cd backend
+uv sync
+uv run python manage.py migrate
+```
+
+The project uses SQLite for local development. Django creates the database
+file in `backend/` when migrations are applied.
+
+Start the development server from `backend/`:
+
+```powershell
+uv run python manage.py runserver
+```
+
+Open http://127.0.0.1:8000/ in your browser. Press Ctrl+C in the terminal to
+stop the server. The development server and default settings are not intended
+for production.
