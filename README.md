@@ -42,22 +42,32 @@ features are not implemented yet.
 
 - Python 3.11.2, as specified in `.python-version`
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- PostgreSQL 14 or newer, with a running server, a database, and a user
+  permitted to create tables in that database
 
-From the repository root, install the dependencies and create the database
-tables:
+From the repository root, install the dependencies and create a local
+configuration file:
 
-```powershell
+```bash
 cd backend
 uv sync
+cp .env.example .env
+```
+
+Edit `backend/.env` with your PostgreSQL database name, user, password, host,
+and port. The `.env` file is ignored by Git; do not commit it or share its
+contents. The `.env.example` file documents the required variables without
+containing real credentials.
+
+Apply migrations to create Django's tables in PostgreSQL:
+
+```bash
 uv run python manage.py migrate
 ```
 
-The project uses SQLite for local development. Django creates the database
-file in `backend/` when migrations are applied.
-
 Start the development server from `backend/`:
 
-```powershell
+```bash
 uv run python manage.py runserver
 ```
 
