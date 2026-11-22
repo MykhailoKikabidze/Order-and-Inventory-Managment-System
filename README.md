@@ -42,26 +42,38 @@ features are not implemented yet.
 
 - Python 3.11.2, as specified in `.python-version`
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- PostgreSQL 14 or newer, with a running server, a database, and a user
-  permitted to create tables in that database
+- Docker with Docker Compose, with the Docker engine running
 
-From the repository root, install the dependencies and create a local
-configuration file:
+From the repository root, create a local configuration file if you don't
+already have one:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env` with a database name, user, and password for local
+development. Set `POSTGRES_HOST=127.0.0.1` and `POSTGRES_PORT=5433` so Django
+running on your computer connects to the Compose database. The `.env` file is
+ignored by Git; do not commit it or share its contents. The `.env.example`
+file documents the required variables without containing real credentials.
+
+Start PostgreSQL from the repository root and check its health:
+
+```bash
+docker compose --env-file backend/.env up -d db
+docker compose --env-file backend/.env ps
+```
+
+Wait until the database is healthy. Docker stores its data in a named volume,
+so it persists when the container is recreated. PostgreSQL uses the database,
+user, and password in `.env` only when initializing an empty volume; changing
+those values later does not update an existing database.
+
+Install dependencies and apply migrations to create Django's tables:
 
 ```bash
 cd backend
 uv sync
-cp .env.example .env
-```
-
-Edit `backend/.env` with your PostgreSQL database name, user, password, host,
-and port. The `.env` file is ignored by Git; do not commit it or share its
-contents. The `.env.example` file documents the required variables without
-containing real credentials.
-
-Apply migrations to create Django's tables in PostgreSQL:
-
-```bash
 uv run python manage.py migrate
 ```
 
