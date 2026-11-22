@@ -57,32 +57,46 @@ running on your computer connects to the Compose database. The `.env` file is
 ignored by Git; do not commit it or share its contents. The `.env.example`
 file documents the required variables without containing real credentials.
 
-Start PostgreSQL from the repository root and check its health:
+Build and start Django and PostgreSQL from the repository root:
 
 ```bash
-docker compose --env-file backend/.env up -d db
+docker compose --env-file backend/.env up -d --build
 docker compose --env-file backend/.env ps
 ```
 
-Wait until the database is healthy. Docker stores its data in a named volume,
-so it persists when the container is recreated. PostgreSQL uses the database,
-user, and password in `.env` only when initializing an empty volume; changing
-those values later does not update an existing database.
+Compose waits for PostgreSQL to be healthy before starting Django. Docker
+stores database data in a named volume, so it persists when the container is
+recreated. PostgreSQL uses the database, user, and password in `.env` only
+when initializing an empty volume; changing those values later does not
+update an existing database.
 
-Install dependencies and apply migrations to create Django's tables:
+Apply migrations separately to create Django's tables; they do not run
+automatically when the app starts:
+
+```bash
+docker compose --env-file backend/.env exec app .venv/bin/python manage.py migrate
+```
+
+Open http://127.0.0.1:8000/ in your browser. After changing application code,
+rebuild the image with `docker compose --env-file backend/.env up -d --build`.
+To stop the services without removing their data:
+
+```bash
+docker compose --env-file backend/.env stop
+```
+
+The development server and default settings are not intended for production.
+
+### Running Django outside Docker
+
+Alternatively, start only PostgreSQL with
+`docker compose --env-file backend/.env up -d db`, then run Django locally:
 
 ```bash
 cd backend
 uv sync
 uv run python manage.py migrate
-```
-
-Start the development server from `backend/`:
-
-```bash
 uv run python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000/ in your browser. Press Ctrl+C in the terminal to
-stop the server. The development server and default settings are not intended
-for production.
+Press Ctrl+C to stop the local development server.
