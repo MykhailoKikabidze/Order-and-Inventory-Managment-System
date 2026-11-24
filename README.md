@@ -87,6 +87,21 @@ docker compose --env-file backend/.env stop
 
 The development server and default settings are not intended for production.
 
+### Running tests
+
+With the Compose database running, install the development dependencies and
+run the tests from `backend/`:
+
+```bash
+cd backend
+uv sync
+uv run pytest
+```
+
+The PostgreSQL user needs permission to create databases. Django creates and
+removes a separate test database; it does not run tests against the configured
+development database. The application image does not include test dependencies.
+
 ### Running Django outside Docker
 
 Alternatively, start only PostgreSQL with
