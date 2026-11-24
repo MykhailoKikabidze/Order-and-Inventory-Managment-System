@@ -1,0 +1,54 @@
+name: CI Checks
+
+on: [push, pull_request]
+
+jobs:
+    checks:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Get the code
+            uses: actions/checkout@v7
+          - name: Install uv
+            uses: astral-sh/setup-uv@v9
+            with:
+              version: "0.12.4"
+        
+          - name: Install Python
+            uses: actions/setup-python@v7
+            with:
+              python-version-file: ".python-version"
+
+          - name: Install dependencies
+            working-directory: backend
+            run: uv sync --locked
+
+          - name: Run migrations
+            working-directory: backend
+            run: uv run --locked python manage.py migrate --noinput
+
+          - name: Run tests
+            working-directory: backend
+            run: uv run --locked pytest
+
+        services:
+          db:
+            image: postgres:16
+            env:
+              POSTGRES_DB: ci_db
+              POSTGRES_USER: ci_user
+              POSTGRES_PASSWORD: ci_password
+            ports:
+              - 5432:5432
+            options: >-
+              --health-cmd "pg_isready -U ci_user -d ci_db"
+              --health-interval 10s
+              --health-timeout 5s
+              --health-retries 5
+        
+        env:
+          POSTGRES_DB: ci_db
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_PORT: "5432"

@@ -223,4 +223,5 @@ __marimo__/
 .streamlit/secrets.toml
 
 # GitHub Copilot
-.github
+.github/*
+!.github/workflows/
